@@ -68,7 +68,9 @@ function smarty_function_oxstyle($params, &$smarty)
             $sOriginalStyle = $sStyle;
 
             // Separate query part #3305.
+	        // WBL Resource Loader Start
             if (count($aStyle = explode('?', $sStyle)) > 2) {
+	        // WBL Resource Loader End
 	            $sStyle = $aStyle[0] = $myConfig->getResourceUrl($aStyle[0], $myConfig->isAdmin());
 
 	            if ($sStyle && count($aStyle) > 1) {
@@ -78,14 +80,13 @@ function smarty_function_oxstyle($params, &$smarty)
 		            // Append file modification timestamp #3725.
 		            $sStyle .= '?' . filemtime($sSPath);
 	            }
+	        // WBL Resource Loader Start
             } else {
 	            if (!$sStylePath = $myConfig->getResourcePath($sOriginalStyle, $myConfig->isAdmin())) {
 		            $sStyle = '';
-	            } else {
-		            $sStyle .= '?' . filemtime($sStylePath);
-	            } // else
+	            } // if
             } // else
-
+	        // WBL Resource Loader End
         }
 
         // File not found ?
@@ -108,19 +109,24 @@ function smarty_function_oxstyle($params, &$smarty)
         }
     } else {
 	    // WBL Resource Loader Start
-	    $aWBLResources = array();
-	    $sWBLUrl       = $myConfig->getResourceUrl('css/css.php');
+	    $iHighestWBLTimestamp = 0;
+	    $aWBLResources        = array();
+	    $sWBLUrl              = $myConfig->getResourceUrl('css/css.php');
 
         foreach ($aStyles as $sSrc) {
 	        if (!$sWBLUrl || preg_match('#^https?://#', $sSrc)) {
 		        $sOutput .= '<link rel="stylesheet" type="text/css" href="' . $sSrc . '" />' . PHP_EOL;
 	        } else {
 		        $aWBLResources[] = $sSrc;
-	        }
+
+		        if (($sStylePath = $myConfig->getResourcePath($sSrc, $myConfig->isAdmin())) && (($mTime = filemtime($sStylePath)) > $iHighestWBLTimestamp)) {
+					$iHighestWBLTimestamp = $mTime;
+				} // if
+	        } // else
         }
 
 	    if ($sWBLUrl && $aWBLResources) {
-		    $sOutput .= '<link rel="stylesheet" type="text/css" href="' . $sWBLUrl . '?' . http_build_query(array('aFiles' => $aWBLResources)) . '" />' . PHP_EOL;
+		    $sOutput .= '<link rel="stylesheet" type="text/css" href="' . $sWBLUrl . '?' . http_build_query(array('aWBLFiles' => $aWBLResources, 'iWBLTimestamp' => $iHighestWBLTimestamp)) . '" />' . PHP_EOL;
 	    } // if
 	    // WBL Resource Loader End
 

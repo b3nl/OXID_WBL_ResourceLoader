@@ -1,4 +1,4 @@
 <?php
-	$sWBLResourceType = 'text/css';
+	$sWBLResourceType = 'css';
 
 	require_once realpath(dirname(__FILE__) . '/../js/js.php');

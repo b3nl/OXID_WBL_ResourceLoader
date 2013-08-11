@@ -70,7 +70,9 @@ function smarty_function_oxscript($params, &$smarty)
 		    $sOriginalScript = $sScript;
 
 		    // Separate query part #3305.
+		    // WBL Resouce Loader Start
 		    if (count($aScript = explode('?', $sScript)) > 1) {
+			// WBL Resouce Loader End
 			    $sScript = $myConfig->getResourceUrl($aScript[0], $myConfig->isAdmin());
 
 			    if ($sScript && count($aScript) > 1) {
@@ -80,13 +82,13 @@ function smarty_function_oxscript($params, &$smarty)
 				    // Append file modification timestamp #3725.
 				    $sScript .= '?' . filemtime($sSPath);
 			    }
+			// WBL Resouce Loader Start
 		    } else {
 				if (!$sScriptPath = $myConfig->getResourcePath($sOriginalScript, $myConfig->isAdmin())) {
 					$sScript = '';
-				} else {
-					$sScript .= '?' . filemtime($sScriptPath);
-				} // else
-		    }
+				} // if
+		    } // else
+		    // WBL Resouce Loader End
         }
 
         // File not found ?
@@ -150,8 +152,9 @@ function _oxscript_include( $aInclude, $sWidget )
     $aWidgets = array();
 
 	// WBL Resouce Loader Start
-	$aWBLResources = array();
-	$sWBLUrl = $myConfig->getResourceUrl('js/js.php');
+	$iHighestWBLTimestamp = 0;
+	$aWBLResources        = array();
+	$sWBLUrl              = $myConfig->getResourceUrl('js/js.php');
 
     foreach ( $aInclude as $aPriority ) {
         foreach ( $aPriority as $sSrc ) {
@@ -170,7 +173,7 @@ function _oxscript_include( $aInclude, $sWidget )
     }
 
 	if ($sWBLUrl && $aWBLResources) {
-		$sOutput .= '<script type="text/javascript" src="' . $sWBLUrl . '?' . http_build_query(array('aFiles' => $aWBLResources)) . '"></script>' . PHP_EOL;
+		$sOutput .= '<script type="text/javascript" src="' . $sWBLUrl . '?' . http_build_query(array('aWBLFiles' => $aWBLResources, 'iWBLTimestamp' => $iHighestWBLTimestamp)) . '"></script>' . PHP_EOL;
 	} // if
 	// WBL Resource Loader End
 
