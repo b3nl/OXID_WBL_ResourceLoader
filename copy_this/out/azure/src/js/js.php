@@ -197,7 +197,7 @@ if (!function_exists('_exitWBLScriptWithNoFiles')) {
 	} else {
 		header('HTTP/1.1 200 OK');
 
-		(bool) $sCacheContent = _getCacheContentForWBLResources(
+		$bFoundCache = (bool) $sCacheContent = _getCacheContentForWBLResources(
 			$sCacheKey = 'wbl_' . $sWBLResourceType . '_' . $sETag
 		);
 
