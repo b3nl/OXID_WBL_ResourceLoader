@@ -166,6 +166,10 @@ function _oxscript_include( $aInclude, $sWidget )
                     $sOutput .= '<script type="text/javascript" src="'.$sSrc.'"></script>'.PHP_EOL;
                 } else {
 	                $aWBLResources[] = $sSrc;
+
+	                if (($sScriptPath = $myConfig->getResourcePath($sSrc, $myConfig->isAdmin())) && (($mTime = filemtime($sScriptPath)) > $iHighestWBLTimestamp)) {
+						$iHighestWBLTimestamp = $mTime;
+	                } // if
                 }
             }
             $aUsedSrc[] = $sSrc;
